@@ -1,0 +1,4 @@
+
+https://github.com/prometheus-operator/prometheus-operator/releases/download/0.68.0/bundle.yaml 
+kubectl create -f bundle.yaml
+kubectl delete -f bundle.yaml

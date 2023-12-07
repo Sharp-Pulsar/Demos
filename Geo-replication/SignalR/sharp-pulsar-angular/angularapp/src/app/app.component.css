@@ -1,0 +1,38 @@
+div.grid-title {
+  background-color: blue;
+  color: white;
+}
+
+div.grid-row {
+  background-color: ivory;
+  border: 1px solid blue;
+}
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333333;
+}
+
+li {
+  float: left;
+}
+
+  li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 16px;
+    text-decoration: none;
+  }
+
+    li a:hover {
+      background-color: #111111;
+    }
+.one {
+  overflow: scroll;
+  max-width:750px;
+  border-left: 1px solid #999;
+  border-right: 1px solid #999;
+}

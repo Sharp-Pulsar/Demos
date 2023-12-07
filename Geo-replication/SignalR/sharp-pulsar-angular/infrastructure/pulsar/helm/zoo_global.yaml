@@ -1,0 +1,79 @@
+#https://medium.com/@sherlockxu/pulsar-on-kubernetes-using-operator-lifecycle-manager-to-install-pulsar-operators-75243e459b3a
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+# helm install global -n zookeeper -f zoo_global.yaml apache/pulsar
+# helm install oxia -n oxia -f values.yaml streamnative/oxia
+# helm install pulsar -n pulsar -f value.yaml apache/pulsar
+# helm delete zoo-global
+# kubectl -n zookeeper describe pods zoo-global-pulsar-zookeeper-0
+# kubectl create namespace zookeeper
+# kubectl delete namespace zookeeper
+
+## kubectl port-forward --address localhost,192.168.0.131 --namespace zookeeper global-pulsar-zookeeper-0 8000:8000 2181:2181 2888:2888 3888:3888
+
+### Namespace to deploy pulsar
+# The namespace to use to deploy the pulsar components, if left empty
+# will default to .Release.Namespace (aka helm --namespace).
+namespace: "zookeeper"
+namespaceCreate: false
+
+## clusterDomain as defined for your k8s cluster
+#clusterDomain: cluster.local
+
+metadataPrefix: ""
+## Set cluster name
+clusterName: "global"
+## disable pulsar-manager
+components:
+   # zookeeper
+  zookeeper: true
+  # bookkeeper
+  bookkeeper: false
+  pulsar_manager: false
+  broker: false
+  # bookkeeper - autorecovery
+  autorecovery: false
+  # functions
+  functions: false
+## disable monitoring stack
+   # toolset
+  toolset: false
+  # proxy
+  proxy: false
+
+kube-prometheus-stack:
+  enabled: false
+  prometheusOperator:
+    enabled: false
+  grafana:
+    enabled: false
+  alertmanager:
+    enabled: false
+  prometheus:
+    enabled: false
+    
+images:
+  zookeeper:
+    repository: apachepulsar/pulsar-all
+    # uses defaultPulsarImageTag when unspecified
+    tag: "3.1.1"
+    pullPolicy: IfNotPresent
+    
+zookeeper:
+  # External zookeeper server list in case of global-zk list to create zk cluster across zk deployed on different clusters/namespaces
+  # Example value: "us-east1-pulsar-zookeeper-0.us-east1-pulsar-zookeeper.us-east1.svc.cluster.local:2888:3888,us-east1-pulsar-zookeeper-1.us-east1-pulsar-zookeeper.us-east1.svc.cluster.local:2888:3888,us-east1-pulsar-zookeeper-2.us-east1-pulsar-zookeeper.us-east1.svc.cluster.local:2888:3888,us-west1-pulsar-zookeeper-0.us-west1-pulsar-zookeeper.us-west1.svc.cluster.local:2888:3888,us-west1-pulsar-zookeeper-1.us-west1-pulsar-zookeeper.us-west1.svc.cluster.local:2888:3888,us-west1-pulsar-zookeeper-2.us-west1-pulsar-zookeeper.us-west1.svc.cluster.local:2888:3888"
+  externalZookeeperServerList: ""

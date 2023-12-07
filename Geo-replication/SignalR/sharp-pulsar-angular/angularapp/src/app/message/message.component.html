@@ -1,0 +1,41 @@
+<div class="row">
+  <div class="mx-auto">
+    <div class="content mx-auto col-10 col-md-8 col-lg-6">
+      <button class="open-button" (click)="openForm()">Message</button>
+      <div class="message-popup" id="messageForm">
+        <form [formGroup]="form" class="form-container">
+          <label for="msg"><b>Message</b></label>
+          <textarea placeholder="Type message.." name="msg" formControlName="message" required></textarea>
+
+          <button mat-button class="btn" type="submit" matSuffix mat-icon-button aria-label="Submit" value="Submit!" (click)="onMessageSubmit()">
+            Send
+          </button>
+          <button type="button" class="btn cancel" (click)="closeForm()">Close</button>
+        </form>
+      </div>
+    </div>
+  </div>  
+  <div class="mx-auto">
+    <div *ngFor="let msg of Messages()" class="mx-auto col-10 col-md-8 col-lg-6">
+      <mat-card>
+        <mat-card-content>
+          <div class="mx-auto col-12">
+            <div>
+              <div style="text-align: center">
+                {{msg.username}}
+              </div>
+              <div style="background-color:antiquewhite">
+                <p>{{msg.message}}</p>
+              </div>
+              <div style="text-align: right">
+                {{msg.timestamp | date :'short'}}
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+        <mat-divider></mat-divider>
+      </mat-card>
+    </div>
+  </div>
+
+</div>

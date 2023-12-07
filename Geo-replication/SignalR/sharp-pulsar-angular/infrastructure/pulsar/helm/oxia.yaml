@@ -1,0 +1,60 @@
+#https://medium.com/@sherlockxu/pulsar-on-kubernetes-using-operator-lifecycle-manager-to-install-pulsar-operators-75243e459b3a
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+# https://github.com/streamnative/oxia/blob/main/docs/correctness.md
+# https://github.com/streamnative/oxia/blob/main/docs/ks8-deploy.md
+# helm upgrade --install monitoring C:\Users\eaban\kube-prometheus-stack --namespace monitoring --values C:\Users\eaban\source\repos\oxia\deploy\dashboards\values-kube-prometheus-stack.yaml
+# helm upgrade --install monitoring kube-prometheus-stack --namespace monitoring --values deploy/dashboards/values-kube-prometheus-stack.yaml C:\Users\eaban\kube-prometheus-stack\charts
+# helm upgrade --install oxia --namespace oxia --set image.repository=streamnative/oxia --set image.tag=main --set image.pullPolicy=Never C:\Users\eaban\source\repos\oxia\deploy\charts\oxia-cluster
+# helm install pulsar -f value.yaml apache/pulsar
+# helm delete oxia --namespace oxia
+# kubectl port-forward --address 192.168.0.131 --namespace oxia oxia-0 6648:6648 & \
+# kubectl port-forward --address 192.168.0.131 --namespace oxia oxia-1 6647:6648 & \
+# kubectl port-forward --address 192.168.0.131 --namespace oxia oxia-2 6646:6648 & 
+
+
+
+
+initialShardCount: 3
+replicationFactor: 3
+
+coordinator:
+  cpu: 100m
+  memory: 128Mi
+  ports:
+    internal: 6649
+    metrics: 8080
+
+server:
+  replicas: 3
+  cpu: 1
+  memory: 1Gi
+  storage: 8Gi
+  #storageClassName: xxx
+  ports:
+    public: 6648
+    internal: 6649
+    metrics: 8080
+
+image:
+  repository: streamnative/oxia
+  tag: main
+  pullPolicy: Always
+  #pullSecrets: xxx
+
+pprofEnabled: false
+monitoringEnabled: false

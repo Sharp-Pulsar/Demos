@@ -1,0 +1,74 @@
+<div class="container text-center">
+ 
+  <div *ngIf="!username" style="font-family: century gothic; margin-top:10%; margin-left: 40%">
+    <div class="row">
+      <div class="col-12">
+        <div>
+          <h2 class="title">Login</h2>
+          <form [formGroup]="form" class="animated fadeInDown" (submit)="connect()">
+            <div>
+              <mat-form-field appearance="outline" class="fw">
+                <mat-label>Username</mat-label>
+                <input matInput formControlName="username">
+              </mat-form-field>
+            </div>
+            <div>
+              <mat-form-field appearance="outline" class="fw">
+                <mat-label>Password</mat-label>
+                <input matInput formControlName="password">
+              </mat-form-field>
+            </div>
+            <div>
+              <mat-card-actions>
+                <button mat-button type="submit" matSuffix mat-icon-button aria-label="Submit" value="Submit!" (onclick)="connect()">
+                  LOGIN
+                </button>
+              </mat-card-actions>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="username" style="height: 1000px">
+    <div class="row">
+      <div class="col-2" style="height: 950px; overflow: scroll; scrollbar-width: thin; ">
+        <h2 class="title">Username(s)</h2>
+        <table>
+          <tbody>
+            <tr *ngFor="let u of Clients()">
+              <td>
+                <a [routerLink]="['/message']" [queryParams]='{username: u.username}'>
+                  {{ u.username }}
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col-6" style="height: 950px; overflow: scroll; scrollbar-width: thin; border-left: 1px solid #999; ">
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav navbar-right text-center ">
+            <li class="nav-item">
+              <a class="nav-link" routerLinkActive="active" routerLink="/home">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" routerLinkActive="active" routerLink="/post">Post</a>
+            </li>
+          </ul>
+        </div>
+
+        <router-outlet></router-outlet>
+      </div>
+      <div class="col-4" style="height: 950px; overflow: scroll; scrollbar-width: thin; border-left: 1px solid #999; ">
+        <mat-card *ngFor="let msg of Logs()">
+          <mat-card-content>
+            <p>{{msg}}</p>
+          </mat-card-content>
+          <mat-divider></mat-divider>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,42 @@
+<!--https://material.angular.io/components/card/examples -->
+<div class="row">
+  <div class="mx-auto">
+    <div class="mx-auto col-10 col-md-8 col-lg-6">
+      <button class="open-button" (click)="openForm()">Post</button>
+      <div class="post-popup" id="postForm">
+        <form [formGroup]="form" class="form-container">
+          <label for="msg"><b>Post Message</b></label>
+          <textarea placeholder="Type message.." name="msg" formControlName="message" required></textarea>
+
+          <button mat-button class="btn" type="submit" matSuffix mat-icon-button aria-label="Submit" value="Submit!" (click)="onPostSubmit()">
+            Send
+          </button>
+          <button type="button" class="btn cancel" (click)="closeForm()">Close</button>
+        </form>
+      </div>
+    </div>
+  </div>
+    <div class="mx-auto">
+      <div *ngFor="let post of Posts()" class="mx-auto col-10 col-md-8 col-lg-6">
+        <mat-card>
+          <!--<img mat-card-image src="https://material.angular.io/assets/img/examples/shiba2.jpg" alt="Photo of a Shiba Inu">-->
+          <mat-card-content>
+            <div class="mx-auto col-12">
+              <div>
+                <div style="text-align: center">
+                  {{post.username}}
+                </div>
+                <div style="background-color:antiquewhite">
+                  <p>{{post.message}}</p>
+                </div>
+                <div style="text-align: right">
+                  {{post.timestamp | date :'short'}}
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+        <mat-divider></mat-divider>
+      </div>
+    </div>
+  </div>

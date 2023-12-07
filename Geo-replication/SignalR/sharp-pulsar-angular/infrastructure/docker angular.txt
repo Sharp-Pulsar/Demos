@@ -1,0 +1,11 @@
+docker build -t angularapp:v1.0.0 -f Dockerfile .
+docker run --name angular -p 192.168.0.131:8010:80 -p 192.168.0.131:8020:443 -d angularapp:v1.0.0 
+https://stackoverflow.com/questions/53403103/cors-blocked-in-dockerized-django-rest-angular-project
+https://maximillianxavier.medium.com/solving-cors-problem-on-local-development-with-docker-4d4a25cd8cfe
+https://stackoverflow.com/questions/64457711/docker-nginx-proxy-cors-error-for-post-requests-in-angular-app
+
+CORS
+https://learn.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-7.0
+
+docker build -t webapi:v1.0.0 -f ./webapi/Dockerfile .
+docker run --name webapi -p 192.168.0.131:7000:80 -p 192.168.0.131:7001:443 -d webapi:v1.0.0 

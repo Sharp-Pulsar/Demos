@@ -1,0 +1,11 @@
+choco install kind
+choco install kubernetes-helm
+choco install kubernetes-cli
+helm repo add streamnative https://charts.streamnative.io
+helm repo update
+
+helm install --set initialize=true pulsar streamnative/sn-platform
+
+https://github.com/prometheus-operator/prometheus-operator/releases/download/0.68.0/bundle.yaml 
+kubectl create -f bundle.yaml
+kubectl delete -f bundle.yaml

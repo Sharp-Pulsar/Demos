@@ -1,0 +1,187 @@
+#https://medium.com/@sherlockxu/pulsar-on-kubernetes-using-operator-lifecycle-manager-to-install-pulsar-operators-75243e459b3a
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+# helm install lagos -n lagos -f value.yaml apache/pulsar
+
+# helm install oxia -n oxia -f values.yaml streamnative/oxia
+# helm install pulsar -n pulsar -f value.yaml apache/pulsar
+# helm delete lagos -n lagos
+
+# kubectl create namespace lagos
+# kubectl delete namespace lagos
+
+# kubectl port-forward --address localhost,192.168.0.131 --namespace lagos lagos-pulsar-broker-0 8080:8080 6650:6650 
+## kubectl port-forward --address localhost,192.168.0.131 --namespace lagos lagos-pulsar-proxy-0 8080:8080 6650:6650 
+## kubectl port-forward --address localhost,192.168.0.131 --namespace zookeeper zoo-global-pulsar-zookeeper-0 8000:8000 2181:2181 2888:2888 3888:3888
+# kubectl port-forward --address localhost,192.168.0.131 --namespace lagos lagos-pulsar-pulsar-manager-547db4f75c-j8lvb 9527:9527
+# WINDOWS CMD: 
+# https://linuxhint.com/install-use-curl-windows/
+# curl http://192.168.0.131:9527/pulsar-manager/csrf-token
+# curl -H "X-XSRF-TOKEN: 62117b4c-9bee-46d7-a26a-1c855e236d15" -H "Cookie: XSRF-TOKEN=62117b4c-9bee-46d7-a26a-1c855e236d15;" -H "Content-Type: application/json" -X PUT http://192.168.0.131:7750/pulsar-manager/users/superuser -d "{\"name\": \"admin\", \"password\": \"apachepulsar\", \"description\": \"test\", \"email\": \"username@test.org\"}"
+# service-url: http://
+
+
+namespace: "lagos"
+namespaceCreate: false
+
+metadataPrefix: ""
+## Set cluster name
+clusterName: "lagos"
+
+pulsar_metadata:
+  image:
+    # the image used for running `pulsar-cluster-initialize` job
+    repository: apachepulsar/pulsar-all
+    # uses defaultPulsarImageTag when unspecified
+    tag: 3.1.1
+    # pullPolicy: IfNotPresent
+  #configurationStore: "broker-pulsar-zookeeper"
+  #configurationStoreMetadataPrefix: "/configuration-store"
+  #configurationStorePort: 2181
+  #userProvidedZookeepers: "192.168.0.131:2181"
+
+## disable pulsar-manager
+components:
+   # zookeeper
+  zookeeper: true
+  # bookkeeper
+  bookkeeper: true
+  pulsar_manager: false
+  broker: true
+  # bookkeeper - autorecovery
+  autorecovery: true
+  # functions
+  functions: false
+## disable monitoring stack
+   # toolset
+  toolset: true
+  # proxy
+  proxy: true
+kube-prometheus-stack:
+  enabled: false
+  prometheusOperator:
+    enabled: true
+  grafana:
+    enabled: true
+  alertmanager:
+    enabled: true
+  prometheus:
+    enabled: true
+
+images:
+  zookeeper:
+    repository: apachepulsar/pulsar-all
+    # uses defaultPulsarImageTag when unspecified
+    tag: "3.1.1"
+    pullPolicy: IfNotPresent
+  bookie:
+    repository: apachepulsar/pulsar-all
+    # uses defaultPulsarImageTag when unspecified
+    tag: "3.1.1"
+    pullPolicy: IfNotPresent
+  autorecovery:
+    repository: apachepulsar/pulsar-all
+    # uses defaultPulsarImageTag when unspecified
+    tag: "3.1.1"
+    pullPolicy: IfNotPresent
+  broker:
+    repository: apachepulsar/pulsar-all
+    # uses defaultPulsarImageTag when unspecified
+    tag: "3.1.1"
+    pullPolicy: IfNotPresent
+  proxy:
+    repository: apachepulsar/pulsar-all
+    # uses defaultPulsarImageTag when unspecified
+    tag: "3.1.1"
+    pullPolicy: IfNotPresent
+  functions:
+    repository: apachepulsar/pulsar-all
+    # uses defaultPulsarImageTag when unspecified
+    tag: "3.1.1"
+  pulsar_manager:
+    repository: apachepulsar/pulsar-manager
+    tag: v0.4.0
+    pullPolicy: IfNotPresent
+    hasCommand: true
+bookkeeper:
+  # use a component name that matches your grafana configuration
+  # so the metrics are correctly rendered in grafana dashboard
+  component: bookie
+  ## BookKeeper Cluster Initialize
+  ## templates/bookkeeper-cluster-initialize.yaml
+  metadata:
+    ## Set the resources used for running `bin/bookkeeper shell initnewcluster`
+    ##
+    resources:
+      requests:
+        memory: 4Gi
+        cpu: 1
+  replicaCount: 1
+  # configData:
+    # PULSAR_PREFIX_metadataServiceUri: metadata-store:zk:lagos-pulsar-zookeeper:2181,ogun-pulsar-zookeeper:2181
+  affinity:
+    type: preferredDuringSchedulingIgnoredDuringExecution
+broker:
+  # use a component name that matches your grafana configuration
+  # so the metrics are correctly rendered in grafana dashboard
+  component: broker
+  replicaCount: 1
+  configData:
+    PULSAR_PREFIX_enableReplicatedSubscriptions: "true"
+    PULSAR_PREFIX_systemTopicEnabled: "true"
+    PULSAR_PREFIX_topicLevelPoliciesEnabled: "true"
+    #PULSAR_PREFIX_metadataStoreUrl: lagos-pulsar-zookeeper:2181,ogun-pulsar-zookeeper:2181
+    #PULSAR_PREFIX_configurationMetadataStoreUrl: lagos-pulsar-zookeeper:2181,ogun-pulsar-zookeeper:2181,192.168.0.131:2181
+    PULSAR_PREFIX_bookkeeperClientRackawarePolicyEnabled: "false"
+    PULSAR_PREFIX_bookkeeperClientRegionawarePolicyEnabled: "true"
+
+proxy:
+  # use a component name that matches your grafana configuration
+  # so the metrics are correctly rendered in grafana dashboard
+  component: proxy
+  replicaCount: 1
+  annotations: 
+    annotations.kubernetes.io/ingress.class: "nginx"
+  ports:
+    http: 8080
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 1
+  ingress:
+    enabled: true
+    hostname: "lagos.pulsar.com"
+    ingressClassName: "nginx"
+  # This is how prometheus discovers this component
+  podMonitor:
+    enabled: true
+    interval: 10s
+    scrapeTimeout: 10s
+  # True includes annotation for statefulset that contains hash of corresponding configmap, which will cause pods to restart on configmap change
+  restartPodsOnConfigMapChange: false
+zookeeper:
+  # External zookeeper server list in case of global-zk list to create zk cluster across zk deployed on different clusters/namespaces
+  # Example value: "us-east1-pulsar-zookeeper-0.us-east1-pulsar-zookeeper.us-east1.svc.cluster.local:2888:3888,us-east1-pulsar-zookeeper-1.us-east1-pulsar-zookeeper.us-east1.svc.cluster.local:2888:3888,us-east1-pulsar-zookeeper-2.us-east1-pulsar-zookeeper.us-east1.svc.cluster.local:2888:3888,us-west1-pulsar-zookeeper-0.us-west1-pulsar-zookeeper.us-west1.svc.cluster.local:2888:3888,us-west1-pulsar-zookeeper-1.us-west1-pulsar-zookeeper.us-west1.svc.cluster.local:2888:3888,us-west1-pulsar-zookeeper-2.us-west1-pulsar-zookeeper.us-west1.svc.cluster.local:2888:3888"
+  externalZookeeperServerList: "192.168.0.131:2888:3888"  
+  #configData:
+    #PULSAR_PREFIX_server.1: lagos-pulsar-zookeeper-0:2181
+    #PULSAR_PREFIX_server.2: ogun-pulsar-zookeeper-0:2181
+    #PULSAR_PREFIX_server.3: 192.168.0.131:2181
+  
+pulsar_manager:
+  ingress:
+    enabled: true
