@@ -68,8 +68,9 @@ public class PulsarHub : Hub
     }
     public async Task ConsumerUsername(Client client)
     {
-        
+
         //var clients = _chatRepository.GetExcept(Context.ConnectionId);
+        _chatRepository.Add(client);
         var clients = _chatRepository.Get();
         await Clients.All.SendAsync("Loaded", new Loaded(clients));
 
